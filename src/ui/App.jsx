@@ -72,43 +72,28 @@ function findSectionIndices(rows, prefix) {
 function buildClosedTrades(rows) {
   if (!Array.isArray(rows) || rows.length === 0) return []
 
-  // Utility to find a column by trying multiple possible header names
-  const idxOf = (header, names) => names.map(n => header.indexOf(n)).find(i => i > -1) ?? -1
-  const toNum = v => {
-    if (v === null || v === undefined || v === '') return 0
-    return Number(String(v).replace(/[,€\s]/g, '')) || 0
-  }
-
-  // Try Flex Executions/Trade Confirmations header first
+  // Try Flex Execution CSV first (header row with FifoPnlRealized / Realized P/L)
   const header = rows[0]
-  const isHeader = Array.isArray(header) && header.some(h => typeof h === 'string' && /Symbol|Date.?Time|Quantity|Buy\/Sell|Proceeds/.test(h))
-  const looksLikeFlex = isHeader
+  const looksLikeFlex = Array.isArray(header) && (header.includes('FifoPnlRealized') || header.includes('Realized P/L'))
   if (looksLikeFlex) {
-    const iDate = idxOf(header, ['DateTime', 'Date/Time'])
-    const iSymbol = idxOf(header, ['Symbol'])
-    const iQty = idxOf(header, ['Quantity', 'Qty'])
-    const iFees = idxOf(header, ['IBCommission', 'IB Commission', 'Commission'])
-    let iReal = idxOf(header, ['FifoPnlRealized', 'Realized P/L', 'Realized PnL', 'RealizedPNL'])
-    const iProceeds = idxOf(header, ['Proceeds', 'Trade Money', 'Net Cash'])
-    const iCostBasis = idxOf(header, ['Cost Basis', 'CostBasis'])
-    const iSide = idxOf(header, ['Buy/Sell'])
+    const idx = name => header.indexOf(name)
+    const iDate = idx('DateTime')
+    const iSymbol = idx('Symbol')
+    const iQty = idx('Quantity')
+    const iFees = idx('IBCommission') > -1 ? idx('IBCommission') : idx('IB Commission')
+    const iReal = idx('FifoPnlRealized') > -1 ? idx('FifoPnlRealized') : idx('Realized P/L')
+    const iSide = idx('Buy/Sell')
     const trades = []
     for (let i = 1; i < rows.length; i++) {
       const r = rows[i]
       if (!r || !r.length) continue
       const t = parseIbTime(r[iDate])
       if (Number.isNaN(t.getTime())) continue
-      const rawQty = toNum(r[iQty]) || 0
+      const qty = Number(String(r[iQty] ?? '').replaceAll(',', ''))
+      const realized = Number(String(r[iReal] ?? '0').replaceAll(',', ''))
+      const fees = Number(String(r[iFees] ?? '0').replaceAll(',', ''))
       const side = String(r[iSide] || '').toUpperCase()
-      const qty = side === 'SELL' ? -Math.abs(rawQty) : Math.abs(rawQty)
-      const fees = toNum(r[iFees])
-      let realized = iReal > -1 ? toNum(r[iReal]) : 0
-      if (iReal === -1) {
-        const proceeds = toNum(r[iProceeds])
-        const costBasis = toNum(r[iCostBasis])
-        if (proceeds || costBasis || fees) realized = proceeds - fees - costBasis
-      }
-      trades.push({ t, symbol: r[iSymbol], qty, fees, realized, side })
+      trades.push({ t, symbol: r[iSymbol], qty: side === 'SELL' ? -Math.abs(qty) : Math.abs(qty), fees, realized })
     }
     trades.sort((a, b) => a.t - b.t)
     return trades
@@ -131,8 +116,7 @@ function buildClosedTrades(rows) {
       symbol: r[4],
       qty: Number(String(r[6]).replaceAll(',', '')),
       fees: Number(r[9] || 0),
-      realized: Number(r[11] || 0),
-      side: Number(String(r[6]).replaceAll(',', '')) < 0 ? 'SELL' : 'BUY'
+      realized: Number(r[11] || 0)
     })
   }
   trades.sort((a, b) => a.t - b.t)
@@ -194,18 +178,13 @@ function groupTradesIntoSessions(trades, gapMinutes = 15) {
         current.qtySum += Number(trade.qty) || 0
       } else {
         const duration = current.end - current.start
-        // Determine direction from side field if available, else from qty sum
-        const side = current.trades[0]?.side || (current.qtySum < 0 ? 'SELL' : 'BUY')
-        const direction = side === 'BUY' ? 'Long' : 'Short'
-        sessions.push({ symbol, start: current.start, end: current.end, duration, realized: current.realized, fees: current.fees, net: current.realized - current.fees, fills: current.trades.length, direction, trades: current.trades })
+        sessions.push({ symbol, start: current.start, end: current.end, duration, realized: current.realized, fees: current.fees, net: current.realized - current.fees, fills: current.trades.length, direction: current.qtySum < 0 ? 'Long' : 'Short', trades: current.trades })
         current = { symbol, trades: [trade], start: trade.t, end: trade.t, realized: Number(trade.realized) || 0, fees: Number(trade.fees) || 0, qtySum: Number(trade.qty) || 0 }
       }
     }
     if (current) {
       const duration = current.end - current.start
-      const side = current.trades[0]?.side || (current.qtySum < 0 ? 'SELL' : 'BUY')
-      const direction = side === 'BUY' ? 'Long' : 'Short'
-      sessions.push({ symbol, start: current.start, end: current.end, duration, realized: current.realized, fees: current.fees, net: current.realized - current.fees, fills: current.trades.length, direction, trades: current.trades })
+      sessions.push({ symbol, start: current.start, end: current.end, duration, realized: current.realized, fees: current.fees, net: current.realized - current.fees, fills: current.trades.length, direction: current.qtySum < 0 ? 'Long' : 'Short', trades: current.trades })
     }
   }
   return sessions
@@ -352,8 +331,11 @@ export default function App() {
     <div className="max-w-6xl mx-auto px-4 py-6">
       <header className="sticky top-0 z-10 mb-4">
         <div className="flex items-center justify-between bg-panel/80 backdrop-blur border border-border rounded-xl px-4 py-3">
-          <h1 className="text-lg font-semibold">IBKR PnL Visualizer</h1>
-          <div className="flex items-center gap-2 text-sm text-gray-300">
+          <div className="flex items-center gap-3">
+            <img src="/logo.svg" alt="IBKR PnL Visualizer" className="w-8 h-8" />
+            <h1 className="text-lg font-semibold">IBKR PnL Visualizer</h1>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-300 flex-wrap justify-end">
             <input ref={inputRef} type="file" accept=".csv" onChange={onFile} className="hidden" />
             <button className="button-primary" onClick={() => inputRef.current?.click()}>Upload CSV</button>
             <button className="button" onClick={()=>setShowHelp(true)}>How do I get my CSV?</button>
@@ -361,14 +343,14 @@ export default function App() {
         </div>
       </header>
 
+      {/* privacy note between header card and chart card */}
+      <div className="w-full flex justify-center my-3">
+        <div className="text-xs text-gray-300 bg-panel2 border border-border rounded-md px-3 py-1">
+          All processing is local — your file never leaves your browser
+        </div>
+      </div>
+
       <section className="card p-5 mb-4">
-        {isDemo && (
-          <div className="w-full flex justify-center">
-            <div className="text-xs text-emerald-200 bg-emerald-900/40 border border-emerald-800 rounded-md px-3 py-1 mb-3">
-              Demo data preview — upload your CSV to see your own performance
-            </div>
-          </div>
-        )}
         <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
           <div>
             <div className="text-emerald-400 text-xs tracking-wide uppercase">All PnL (combined)</div>
@@ -382,7 +364,16 @@ export default function App() {
             ))}
           </div>
         </div>
-        <div className="h-[360px]"><Line data={chartData} options={options} /></div>
+        <div className="relative h-[360px]">
+          {isDemo && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+              <div className="text-[11px] text-emerald-200 bg-emerald-900/40 border border-emerald-800 rounded-md px-3 py-1.5 backdrop-blur-sm shadow">
+                Demo data — upload your CSV to see your own performance
+              </div>
+            </div>
+          )}
+          <Line data={chartData} options={options} />
+        </div>
       </section>
 
       {showHelp && (
@@ -407,8 +398,8 @@ export default function App() {
       <section className="card p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="tabs">
-            <button className={`tab ${tab==='aggregated'?'active':''}`} onClick={()=>setTab('aggregated')}>Aggregated</button>
-            <button className={`tab ${tab==='trades'?'active':''}`} onClick={()=>setTab('trades')}>Completed Trades</button>
+            <button className={`tab ${tab==='aggregated'?'active':''}`} onClick={()=>setTab('aggregated')}>Completed Trades</button>
+            <button className={`tab ${tab==='trades'?'active':''}`} onClick={()=>setTab('trades')}>Orders</button>
           </div>
         </div>
         {isDemo && (
@@ -424,31 +415,25 @@ export default function App() {
                 <th>End Time</th>
                 <th>Asset</th>
                 <th>Direction</th>
-                <th>Duration</th>
                 <th>PnL</th>
-                <th>Fees</th>
-                <th>Net PnL</th>
                 <th>Fills</th>
               </tr>
             </thead>
             <tbody>
               {groupedChrono.map(row => {
-                const pnlCls = row.net >= 0 ? 'pnl-pos' : 'pnl-neg'
+                const pnlCls = row.realized >= 0 ? 'pnl-pos' : 'pnl-neg'
                 return (
                   <>
                     <tr key={row.symbol} className="cursor-pointer" onClick={() => toggle(row.symbol)}>
                       <td className="whitespace-nowrap">{row.end?.toLocaleString?.() || '—'}</td>
                       <td className="whitespace-nowrap">{row.symbol}</td>
                       <td>{row.direction}</td>
-                      <td>{formatDuration(row.duration)}</td>
                       <td className={row.realized>=0?'pnl-pos':'pnl-neg'}>{formatCurrency(row.realized)}</td>
-                      <td>{formatCurrency(row.fees)}</td>
-                      <td className={pnlCls}>{formatCurrency(row.net)}</td>
                       <td>{row.fills}</td>
                     </tr>
                     {expanded[row.symbol] && (
                       <tr>
-                        <td colSpan={8}>
+                        <td colSpan={5}>
                           <div className="p-2 bg-panel2 rounded-lg border border-border/60">
                             <table className="min-w-full text-xs">
                               <thead>
@@ -456,7 +441,6 @@ export default function App() {
                                   <th>Time</th>
                                   <th>Qty</th>
                                   <th>PnL</th>
-                                  <th>Fees</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -465,7 +449,6 @@ export default function App() {
                                     <td>{t.t.toLocaleString()}</td>
                                     <td>{t.qty}</td>
                                     <td className={t.realized>=0?'pnl-pos':'pnl-neg'}>{formatCurrency(t.realized)}</td>
-                                    <td>{formatCurrency(t.fees||0)}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -486,25 +469,18 @@ export default function App() {
                 <th>End Time</th>
                 <th>Asset</th>
                 <th>Direction</th>
-                <th>Duration</th>
                 <th>PnL</th>
-                <th>Fees</th>
-                <th>Net PnL</th>
                 <th>Fills</th>
               </tr>
             </thead>
             <tbody>
               {closedTrades.slice().sort((a,b)=>b.t-a.t).map((t,i)=>{
-                const net = (t.realized||0) - (t.fees||0)
                 return (
                   <tr key={i}>
                     <td>{t.t.toLocaleString()}</td>
                     <td>{t.symbol}</td>
                     <td>{t.qty<0?'Long':'Short'}</td>
-                    <td>—</td>
                     <td className={t.realized>=0?'pnl-pos':'pnl-neg'}>{formatCurrency(t.realized)}</td>
-                    <td>{formatCurrency(t.fees||0)}</td>
-                    <td className={net>=0?'pnl-pos':'pnl-neg'}>{formatCurrency(net)}</td>
                     <td>1</td>
                   </tr>
                 )

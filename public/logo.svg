@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="IBKR PnL Visualizer logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#12181d"/>
+      <stop offset="1" stop-color="#0b1116"/>
+    </linearGradient>
+  </defs>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="12" fill="url(#bg)" stroke="#1c2228"/>
+  <!-- subtle grid tick -->
+  <path d="M11 47 H53" stroke="#24313a" stroke-width="1" opacity=".4"/>
+  <path d="M11 35 H53" stroke="#24313a" stroke-width="1" opacity=".25"/>
+  <path d="M11 23 H53" stroke="#24313a" stroke-width="1" opacity=".15"/>
+  <!-- green PnL line -->
+  <path d="M10 45 C 18 43 22 38 28 34 S 40 26 46 27 52 30 56 20" fill="none" stroke="#3be389" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="56" cy="20" r="3.2" fill="#3be389"/>
+  <!-- small IBKR hint -->
+  <text x="12" y="22" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto" font-size="10" fill="#cfd9d5" letter-spacing=".6">IBKR</text>
+</svg>
+
+
