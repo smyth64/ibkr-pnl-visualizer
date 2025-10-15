@@ -26,21 +26,41 @@ Export instructions (Flex Query) 📤
 
 Important: Use "Closed Lots" (or include the Realized P/L fields). This guarantees correct realized PnL.
 
-1) Log in to IBKR Client Portal
-2) Reports → Flex Queries → Activity Flex Query
-3) Sections: Closed Lots (recommended)
-4) Include columns:
+How do I get my CSV? (quick illustrated guide)
+
+1) Open the IBKR Client Portal and go to Performance & Reports → Flex Queries
+
+![Go to Flex Queries](public/img/1.png)
+
+2) Create a new Activity Flex Query (the plus button)
+
+![Create Activity Flex Query](public/img/2.png)
+
+3) In Sections, choose Trades
+
+![Choose Trades section](public/img/3.png)
+
+4) Under Options, set Execution to Closed Lots and select these columns:
    - Date/Time (DateTime)
    - Symbol
-   - Asset Class / Currency
+   - Asset Class
+   - Currency
    - Quantity
    - Proceeds
-   - Commission (IB Commission)
+   - IB Commission
    - Cost Basis
    - Realized P/L (or FifoPnlRealized)
    - Buy/Sell
-5) Output: CSV
-6) Run → download → click "Upload CSV" in the app
+
+![Closed Lots + columns](public/img/4.png)
+
+5) In Delivery Configuration, choose CSV and keep column headers enabled
+
+![Choose CSV output](public/img/5.png)
+
+6) Save the query and run it (arrow button) → download the CSV → click "Upload CSV" in the app
+
+![Run and download](public/img/6.png)
 
 Notes
 

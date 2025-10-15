@@ -386,13 +386,33 @@ export default function App() {
               <h3 className="text-base">How to export your CSV from IBKR</h3>
               <button className="button" onClick={()=>setShowHelp(false)}>Close</button>
             </div>
-            <ol className="list-decimal pl-6 text-sm text-gray-300 mt-1 space-y-1">
-              <li>Log in to the IBKR Client Portal</li>
-              <li>Go to Reports → Flex Queries → create an Activity Flex Query</li>
-              <li>Sections: Closed Lots. <br/>Include: DateTime, Symbol, Asset Class, Currency, Quantity, Proceeds, Commission, Cost Basis, Realized P/L, Buy/Sell</li>
-              <li>Output format: CSV</li>
-              <li>Run the query, download the file, then click “Upload CSV”</li>
-            </ol>
+            <div className="text-sm text-gray-300 mt-1 space-y-3">
+              <p>Follow these steps, then click <span className="font-medium">Upload CSV</span> here in the app</p>
+              <div>
+                <p className="font-medium">1) Performance & Reports → Flex Queries</p>
+                <img src="/img/1.png" alt="Go to Flex Queries" className="mt-1 w-full rounded-lg border border-border" />
+              </div>
+              <div>
+                <p className="font-medium">2) Create a new Activity Flex Query</p>
+                <img src="/img/2.png" alt="Create Activity Flex Query" className="mt-1 w-full rounded-lg border border-border" />
+              </div>
+              <div>
+                <p className="font-medium">3) Choose the Trades section</p>
+                <img src="/img/3.png" alt="Choose Trades section" className="mt-1 w-full rounded-lg border border-border" />
+              </div>
+              <div>
+                <p className="font-medium">4) Set Execution to Closed Lots and select the columns listed</p>
+                <img src="/img/4.png" alt="Closed Lots and required columns" className="mt-1 w-full rounded-lg border border-border" />
+              </div>
+              <div>
+                <p className="font-medium">5) Set output to CSV and keep column headers</p>
+                <img src="/img/5.png" alt="Set output to CSV" className="mt-1 w-full rounded-lg border border-border" />
+              </div>
+              <div>
+                <p className="font-medium">6) Save and run → download CSV → Upload here</p>
+                <img src="/img/6.png" alt="Run query and download CSV" className="mt-1 w-full rounded-lg border border-border" />
+              </div>
+            </div>
           </div>
         </div>
       )}
