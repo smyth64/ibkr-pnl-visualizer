@@ -44,4 +44,41 @@ Notes
 - Demo data is generated on-the-fly for a pleasant first impression
 - Privacy: All processing happens locally in your browser. Files are never uploaded to a server.
 
+Run locally (with Vite)
+
+This is a React + Vite app. Opening `index.html` from the file system won’t work (blank page) because the modules are served by the dev server. Use Vite:
+
+1) Requirements: Node 18+ and npm
+2) Install deps
+
+```bash
+npm ci
+```
+
+3) Start dev server
+
+```bash
+npm run dev
+```
+
+Open the printed URL (default `http://localhost:5174`).
+
+4) Build static files (for hosting on any static host)
+
+```bash
+npm run build
+npm run preview # optional local preview
+```
+
+Deploying
+
+- Static hosting (recommended): Deploy the `dist/` folder to any static host (GitHub Pages, Cloudflare Pages, Netlify, Vercel static, NGINX). No backend required.
+- Railway: either use a Static Site (publish dir `dist`) or a Node service with `npm run preview -- --host 0.0.0.0 --port $PORT`.
+
+CSV export reminder
+
+- Use Flex Query → Activity Flex Query → choose **Closed Lots** (recommended).
+- Include: DateTime, Symbol, Currency, Quantity, Proceeds, Commission, Cost Basis, Realized P/L, Buy/Sell.
+- Output: CSV → Run → download → Upload in the app.
+
 
