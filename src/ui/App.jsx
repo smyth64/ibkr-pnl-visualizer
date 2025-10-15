@@ -379,9 +379,9 @@ export default function App() {
       </section>
 
       {showHelp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto">
           <div className="absolute inset-0 bg-black/60" onClick={()=>setShowHelp(false)} />
-          <div className="relative card w-[92vw] max-w-lg p-5">
+          <div className="relative card w-[96vw] max-w-4xl p-5 my-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-base">How to export your CSV from IBKR</h3>
               <button className="button" onClick={()=>setShowHelp(false)}>Close</button>
@@ -536,6 +536,24 @@ export default function App() {
       </section>
 
       {/* Removed duplicate bottom list; it's already covered by the tabs above */}
+
+      <footer className="mt-6 mb-2">
+        <div className="flex items-center justify-between bg-panel border border-border rounded-xl px-4 py-3 text-sm text-gray-300">
+          <a
+            href="https://github.com/smyth64/ibkr-pnl-visualizer"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 hover:text-white"
+            aria-label="Open source on GitHub"
+          >
+            <svg viewBox="0 0 16 16" className="w-5 h-5" fill="currentColor" aria-hidden="true">
+              <path fillRule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38C13.71 14.53 16 11.54 16 8c0-4.42-3.58-8-8-8Z" clipRule="evenodd" />
+            </svg>
+            <span>Open source on GitHub</span>
+          </a>
+          <span className="text-xs text-gray-400">here — whatever — it’s open source</span>
+        </div>
+      </footer>
 
       {fileError && <p className="text-red mt-3">{fileError}</p>}
     </div>
