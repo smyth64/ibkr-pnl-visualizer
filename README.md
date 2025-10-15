@@ -24,7 +24,7 @@ Important: Use "Closed Lots" (or include the Realized P/L fields). This guarante
 
 1) Log in to IBKR Client Portal
 2) Reports → Flex Queries → Activity Flex Query
-3) Sections: Closed Lots (recommended) or Executions
+3) Sections: Closed Lots (recommended)
 4) Include columns:
    - Date/Time (DateTime)
    - Symbol

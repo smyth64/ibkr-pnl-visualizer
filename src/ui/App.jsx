@@ -387,7 +387,7 @@ export default function App() {
             <ol className="list-decimal pl-6 text-sm text-gray-300 mt-1 space-y-1">
               <li>Log in to the IBKR Client Portal</li>
               <li>Go to Reports → Flex Queries → create an Activity Flex Query</li>
-              <li>Sections: Executions (or Closed Lots). Include: DateTime, Symbol, Asset Class, Currency, Quantity, Proceeds, Commission, Cost Basis, Realized P/L, Buy/Sell</li>
+              <li>Sections: Closed Lots. Include: DateTime, Symbol, Asset Class, Currency, Quantity, Proceeds, Commission, Cost Basis, Realized P/L, Buy/Sell</li>
               <li>Output format: CSV</li>
               <li>Run the query, download the file, then click “Upload CSV”</li>
             </ol>
