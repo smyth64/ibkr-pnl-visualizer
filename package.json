@@ -1,0 +1,29 @@
+{
+  "name": "ibkr-chart",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite --port 5174",
+    "build": "vite build",
+    "preview": "vite preview --port 5174"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.6",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "papaparse": "^5.4.1",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "autoprefixer": "^10.4.19",
+    "eslint-plugin-react": "^7.37.5",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.13",
+    "vite": "^5.4.8"
+  }
+}

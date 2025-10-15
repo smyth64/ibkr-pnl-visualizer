@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  color-scheme: dark
+}
+
+body{
+  @apply bg-bg text-white min-h-screen selection:bg-green/30 selection:text-white;
+  background-image: radial-gradient(1200px 600px at 80% -100px,#1a2230,transparent);
+}
+
+.card{
+  @apply bg-panel border border-border rounded-xl shadow-[0_8px_30px_rgba(0,0,0,.25)]
+}
+
+.button{
+  @apply px-3 py-2 rounded-lg bg-panel border border-border text-gray-300 hover:bg-panel2 transition-colors
+}
+
+.button.active{ @apply bg-emerald-900/40 text-emerald-200 border-emerald-800 }
+
+.button-primary{ @apply px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium shadow hover:bg-emerald-500 transition-colors }
+
+.tabs{ @apply inline-flex items-center gap-1 bg-panel border border-border rounded-xl p-1 }
+.tab{ @apply px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-panel2 cursor-pointer }
+.tab.active{ @apply bg-emerald-900/40 text-emerald-200 border border-emerald-800 }
+
+table thead th{ @apply text-gray-300 font-semibold border-b border-border px-3 py-2 text-left }
+table tbody td{ @apply border-b border-[#12181d] px-3 py-2 text-gray-100 }
+
+.pnl-pos{ @apply text-green }
+.pnl-neg{ @apply text-red }
+
+
