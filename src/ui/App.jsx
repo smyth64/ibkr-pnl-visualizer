@@ -313,6 +313,8 @@ export default function App() {
   // Chronological (desc) list of aggregated sessions across symbols
   const groupedChrono = useMemo(() => sessions.sort((a, b) => (b.end ?? 0) - (a.end ?? 0)), [sessions])
   const [expanded, setExpanded] = useState({})
+  const [sortConfig, setSortConfig] = useState({ key: 'end', dir: 'desc' })
+  const [ordersSort, setOrdersSort] = useState({ key: 't', dir: 'desc' })
   const toggle = s => setExpanded(prev => ({ ...prev, [s]: !prev[s] }))
 
   function onFile(e) {
@@ -412,15 +414,26 @@ export default function App() {
           <table className="min-w-full text-sm">
             <thead>
               <tr>
-                <th>End Time</th>
-                <th>Asset</th>
-                <th>Direction</th>
-                <th>PnL</th>
-                <th>Fills</th>
+                <th className="cursor-pointer" onClick={()=>setSortConfig(p=>({key:'end',dir:p.key==='end'&&p.dir==='desc'?'asc':'desc'}))}>End Time</th>
+                <th className="cursor-pointer" onClick={()=>setSortConfig(p=>({key:'symbol',dir:p.key==='symbol'&&p.dir==='asc'?'desc':'asc'}))}>Asset</th>
+                <th className="cursor-pointer" onClick={()=>setSortConfig(p=>({key:'direction',dir:p.key==='direction'&&p.dir==='asc'?'desc':'asc'}))}>Direction</th>
+                <th className="cursor-pointer" onClick={()=>setSortConfig(p=>({key:'realized',dir:p.key==='realized'&&p.dir==='desc'?'asc':'desc'}))}>PnL</th>
+                <th className="cursor-pointer" onClick={()=>setSortConfig(p=>({key:'fills',dir:p.key==='fills'&&p.dir==='desc'?'asc':'desc'}))}>Fills</th>
               </tr>
             </thead>
             <tbody>
-              {groupedChrono.map(row => {
+              {groupedChrono
+                .slice()
+                .sort((a,b)=>{
+                  const k = sortConfig.key
+                  const dir = sortConfig.dir==='asc'?1:-1
+                  const av = k==='end'? +a.end : k==='realized'? a.realized : k==='fills'? a.fills : a[k]
+                  const bv = k==='end'? +b.end : k==='realized'? b.realized : k==='fills'? b.fills : b[k]
+                  if (av < bv) return -1*dir
+                  if (av > bv) return 1*dir
+                  return 0
+                })
+                .map(row => {
                 const pnlCls = row.realized >= 0 ? 'pnl-pos' : 'pnl-neg'
                 return (
                   <>
@@ -466,15 +479,26 @@ export default function App() {
           <table className="min-w-full text-sm">
             <thead>
               <tr>
-                <th>End Time</th>
-                <th>Asset</th>
-                <th>Direction</th>
-                <th>PnL</th>
+                <th className="cursor-pointer" onClick={()=>setOrdersSort(p=>({key:'t',dir:p.key==='t'&&p.dir==='desc'?'asc':'desc'}))}>End Time</th>
+                <th className="cursor-pointer" onClick={()=>setOrdersSort(p=>({key:'symbol',dir:p.key==='symbol'&&p.dir==='asc'?'desc':'asc'}))}>Asset</th>
+                <th className="cursor-pointer" onClick={()=>setOrdersSort(p=>({key:'dir',dir:p.key==='dir'&&p.dir==='asc'?'desc':'asc'}))}>Direction</th>
+                <th className="cursor-pointer" onClick={()=>setOrdersSort(p=>({key:'realized',dir:p.key==='realized'&&p.dir==='desc'?'asc':'desc'}))}>PnL</th>
                 <th>Fills</th>
               </tr>
             </thead>
             <tbody>
-              {closedTrades.slice().sort((a,b)=>b.t-a.t).map((t,i)=>{
+              {closedTrades
+                .slice()
+                .sort((a,b)=>{
+                  const k = ordersSort.key
+                  const dir = ordersSort.dir==='asc'?1:-1
+                  const av = k==='t'? +a.t : k==='realized'? a.realized : k==='dir'? (a.qty<0?'Long':'Short') : a[k]
+                  const bv = k==='t'? +b.t : k==='realized'? b.realized : k==='dir'? (b.qty<0?'Long':'Short') : b[k]
+                  if (av < bv) return -1*dir
+                  if (av > bv) return 1*dir
+                  return 0
+                })
+                .map((t,i)=>{
                 return (
                   <tr key={i}>
                     <td>{t.t.toLocaleString()}</td>
