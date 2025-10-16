@@ -58,9 +58,16 @@ Important: Use "Closed Lots" (or include the Realized P/L fields). This guarante
 
 ![Choose CSV output](public/img/5.png)
 
-6) Save the query and run it (arrow button) → download the CSV → click "Upload CSV" in the app
+6) At the bottom, set the Date/Time format so the app can parse your CSV correctly:
+   - Date Format: `yyyy-MM-dd`
+   - Time Format: `HH:mm:ss`
+   - Date/Time Separator: `, (comma)`
 
-![Run and download](public/img/6.png)
+![Date & Time format](public/img/6.png)
+
+7) Save the query and run it (arrow button) → download the CSV → click "Upload CSV" in the app
+
+![Run and download](public/img/7.png)
 
 ### Notes
 

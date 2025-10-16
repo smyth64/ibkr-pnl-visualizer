@@ -386,7 +386,7 @@ export default function App() {
               <h3 className="text-base">How to export your CSV from IBKR</h3>
               <button className="button" onClick={()=>setShowHelp(false)}>Close</button>
             </div>
-            <div className="text-sm text-gray-300 mt-1 space-y-3">
+            <div className="text-sm text-gray-300 mt-1 space-y-6">
               <p>Follow these steps, then click <span className="font-medium">Upload CSV</span> here in the app</p>
               <div>
                 <p className="font-medium">1) Performance & Reports → Flex Queries</p>
@@ -409,8 +409,17 @@ export default function App() {
                 <img src="/img/5.png" alt="Set output to CSV" className="mt-1 w-full rounded-lg border border-border" />
               </div>
               <div>
-                <p className="font-medium">6) Save and run → download CSV → Upload here</p>
-                <img src="/img/6.png" alt="Run query and download CSV" className="mt-1 w-full rounded-lg border border-border" />
+                <p className="font-medium">6) Set Date/Time formats so parsing works</p>
+                <ul className="list-disc pl-5 text-gray-400">
+                  <li>Date Format: <code>yyyy-MM-dd</code></li>
+                  <li>Time Format: <code>HH:mm:ss</code></li>
+                  <li>Date/Time Separator: <code>, (comma)</code></li>
+                </ul>
+                <img src="/img/6.png" alt="Set Date & Time format" className="mt-1 w-full rounded-lg border border-border" />
+              </div>
+              <div>
+                <p className="font-medium">7) Save and run → download CSV → Upload here</p>
+                <img src="/img/7.png" alt="Run query and download CSV" className="mt-1 w-full rounded-lg border border-border" />
               </div>
             </div>
           </div>
