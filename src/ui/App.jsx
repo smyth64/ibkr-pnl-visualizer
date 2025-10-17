@@ -317,6 +317,18 @@ export default function App() {
   const [ordersSort, setOrdersSort] = useState({ key: 't', dir: 'desc' })
   const toggle = s => setExpanded(prev => ({ ...prev, [s]: !prev[s] }))
 
+  const { totalProfit, totalLossAbs } = useMemo(() => {
+    if (!closedTrades || !closedTrades.length) return { totalProfit: 0, totalLossAbs: 0 }
+    let profit = 0
+    let lossAbs = 0
+    for (const t of closedTrades) {
+      const r = Number(t.realized) || 0
+      if (r >= 0) profit += r
+      else lossAbs += -r
+    }
+    return { totalProfit: profit, totalLossAbs: lossAbs }
+  }, [closedTrades])
+
   function onFile(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -358,6 +370,15 @@ export default function App() {
             <div className="text-emerald-400 text-xs tracking-wide uppercase">All PnL (combined)</div>
             <div className="text-3xl font-semibold mt-1 text-emerald-300">
               {formatCurrency(series.at(-1)?.v ?? 0)}
+            </div>
+            <div className="mt-1 text-[11px] text-gray-300">
+              <span>
+                Total Profit Realized: <span className="pnl-pos font-medium">{formatCurrency(totalProfit)}</span>
+              </span>
+              <span className="mx-2">•</span>
+              <span>
+                Total Loss Realized: <span className="pnl-neg font-medium">{formatCurrency(totalLossAbs)}</span>
+              </span>
             </div>
           </div>
           <div className="flex gap-2">
